@@ -5,8 +5,10 @@ REGISTRY ?= quay.io/
 IMAGE_PREFIX ?= mozmar
 BASE_IMAGE ?= ${REGISTRY}${IMAGE_PREFIX}/${BASE_IMAGE_NAME}\:${VERSION}
 BASE_IMAGE_LATEST ?= ${REGISTRY}${IMAGE_PREFIX}/${BASE_IMAGE_NAME}\:latest
+IMAGE ?= $(BASE_IMAGE_LATEST)
 KUMA_IMAGE ?= ${REGISTRY}${IMAGE_PREFIX}/${KUMA_IMAGE_NAME}\:${VERSION}
 KUMA_IMAGE_LATEST ?= ${REGISTRY}${IMAGE_PREFIX}/${KUMA_IMAGE_NAME}\:latest
+TEST ?= test #other options in docker-compose.test.yml
 
 target = kuma
 requirements = -r requirements/local.txt
@@ -109,6 +111,10 @@ push-kuma:
 
 push: push-base push-kuma
 
+deis2-pull-dev:
+	deis2 pull ${KUMA_IMAGE} -a mdn-dev
+
+
 tag-latest:
 	docker tag -f ${BASE_IMAGE} ${BASE_IMAGE_LATEST}
 	docker tag -f ${KUMA_IMAGE} ${KUMA_IMAGE_LATEST}
@@ -125,6 +131,11 @@ bash: up
 
 shell_plus: up
 	docker exec -it kuma_web_1 ./manage.py shell_plus
+
+compose-test:
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml run $(TEST)
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml stop
+
 
 # Those tasks don't have file targets
 .PHONY: test coveragetest intern locust clean locale install compilecss compilejsi18n collectstatic localetest localeextract localecompile localerefresh
