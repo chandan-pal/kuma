@@ -112,7 +112,7 @@ push-kuma:
 push: push-base push-kuma
 
 deis2-pull-dev:
-	deis2 pull ${KUMA_IMAGE} -a mdn-dev
+	DEIS_PROFILE=dev-usw deis2 pull ${KUMA_IMAGE} -a mdn-dev
 
 
 tag-latest:
